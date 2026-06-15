@@ -1,0 +1,12 @@
+{
+  "Author": "Tulla Ai",
+  "Name": "Tulla ̶A̶i̶LLM",
+  "Punchline": "Ask the clanker shit.",
+  "Description": "Use /llm to send questions to a local LLM and do web searches.",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "LLM",
+    "plugin",
+    "Search"
+  ]
+}
