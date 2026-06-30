@@ -1,13 +1,11 @@
-using System;
 using System.ComponentModel;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+using Microsoft.Agents.AI;
 
-namespace TullaLLM.Tools;
+namespace TullaLLMLib.Tools;
 
 public class WebSearchTool : IDisposable
 {
@@ -39,9 +37,24 @@ public class WebSearchTool : IDisposable
         {
             // Plugin.Log.Error(ex.Message);
         }
-        
 
         return "Search could not be executed";
+    }
+    
+    public async Task<IEnumerable<TextSearchProvider.TextSearchResult>> SearchAdapter(string query, CancellationToken cancellationToken)
+    {
+        var response = await DoSearch(query);
+        var parsed = JsonSerializer.Deserialize<SearchResult>(response);
+        if (parsed is null)
+        {
+            return [];
+        }
+        return parsed.Data.WebPages.Value.Select(x => new TextSearchProvider.TextSearchResult
+        {
+            SourceLink = x.Url,
+            SourceName = x.Name,
+            Text = x.Summary
+        });
     }
 
     public void Dispose()

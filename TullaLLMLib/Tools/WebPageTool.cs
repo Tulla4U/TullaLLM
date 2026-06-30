@@ -1,9 +1,7 @@
-using System;
 using System.ComponentModel;
-using System.Threading.Tasks;
 using PuppeteerSharp;
 
-namespace TullaLLM.Tools;
+namespace TullaLLMLib.Tools;
 
 public static class WebPageTool
 {

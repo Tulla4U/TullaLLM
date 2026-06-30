@@ -4,7 +4,9 @@ using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using TullaLLM.Util;
 using TullaLLM.Windows;
+using TullaLLMLib;
 
 namespace TullaLLM;
 
@@ -30,7 +32,7 @@ public sealed class Plugin : IDalamudPlugin
 
         ConfigWindow = new ConfigWindow(this);
         
-        AnswerBot = new AnswerBot(Configuration);
+        AnswerBot = new AnswerBot(Configuration.LlmSettings, new ChatInteractor());
 
         WindowSystem.AddWindow(ConfigWindow);
 
