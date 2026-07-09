@@ -73,14 +73,14 @@ public class AnswerBot : IDisposable
     {
         try
         {
-            // if (query.StartsWith("reset"))
-            // {
-            //     query = query["reset".Length..];
-            //     if (session is not null)
-            //     {
-            //         session = await CreateSession();
-            //     }
-            // }
+            if (query.StartsWith("reset"))
+            {
+                query = query["reset".Length..];
+                if (session is not null)
+                {
+                    session = await CreateSession();
+                }
+            }
             await chatInteractor.SendMessage("User", query, ChatType.Party);
             session ??= await CreateSession();
             var response = await agent.RunAsync(query, session);
