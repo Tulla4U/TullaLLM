@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Dalamud.Game.Command;
+﻿using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
@@ -17,7 +16,8 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IPluginLog Log { get; private set; } = null!;    
     [PluginService] internal static IChatGui ChatGui { get; private set; } = null!;
 
-    private const string CommandName = "/llm";
+    private const string QueryCommand = "/llm";
+    private const string ToggleConfigCommand = "/llm-cfg";
 
     public Configuration Configuration { get; init; }
 
@@ -29,16 +29,20 @@ public sealed class Plugin : IDalamudPlugin
     public Plugin()
     {
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-
-        ConfigWindow = new ConfigWindow(this);
         
         AnswerBot = new AnswerBot(Configuration.LlmSettings, new ChatInteractor());
 
+        ConfigWindow = new ConfigWindow(this, AnswerBot);
+
         WindowSystem.AddWindow(ConfigWindow);
 
-        CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+        CommandManager.AddHandler(QueryCommand, new CommandInfo(OnCommand)
         {
-            HelpMessage = "Send queries to your LLM using /llm"
+            HelpMessage = "Send queries to your LLM"
+        });
+        CommandManager.AddHandler(ToggleConfigCommand, new CommandInfo(OnCommand)
+        {
+            HelpMessage = "Open llm config"
         });
 
         // Tell the UI system that we want our windows to be drawn through the window system
@@ -59,15 +63,18 @@ public sealed class Plugin : IDalamudPlugin
 
         ConfigWindow.Dispose();
 
-        CommandManager.RemoveHandler(CommandName);
+        CommandManager.RemoveHandler(QueryCommand);
     }
 
     private void OnCommand(string command, string args)
     {
         switch (command)
         {
-            case CommandName: 
+            case QueryCommand: 
                 AnswerBot.Query(args);
+                break;
+            case ToggleConfigCommand:
+                ToggleConfigUi();
                 break;
         }
     }
