@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Dalamud.Configuration;
 using Translate;
 using TullaLLMLib;
@@ -9,7 +10,10 @@ namespace TullaLLM;
 public class Configuration : IPluginConfiguration
 {
     public int Version { get; set; } = 0;
-    public LlmSettings LlmSettings { get; set; } = new();
+    public LlmSettings LlmSettings { get; set; } = new()
+    {
+        WorkingDirectory = Path.Combine(Plugin.PluginInterface.GetPluginConfigDirectory(), "TullaLLM")
+    };
 
     public TranslationConfig TranslationConfig { get; set; } = new()
     {

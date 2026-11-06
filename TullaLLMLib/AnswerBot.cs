@@ -14,11 +14,13 @@ public class AnswerBot : IDisposable
     private readonly WebSearchTool? search;
     private readonly IChatInteractor chatInteractor;
     private readonly AniListTools aniListTools = new();
+    private readonly WebPageTool webPageTool;
     private bool ready;
     
     public AnswerBot(LlmSettings config, IChatInteractor chatInteractor)
     {
         this.chatInteractor = chatInteractor;
+        webPageTool = new WebPageTool(config);
         if (!string.IsNullOrEmpty(config.LangSearchApiToken))
         {
             
@@ -34,7 +36,6 @@ public class AnswerBot : IDisposable
     }
 
     private const string Instruction = """
-
                                            you are a straight to the point helper that provides short concise answers to the user.
                                            You are running as a plugin in FinalFantasy XIV, assume questions about places and activites are relating to the game.
                                            Answer questions using the provided context.
@@ -44,7 +45,6 @@ public class AnswerBot : IDisposable
                                            When searching for anime information use the GetAnimeOrManga tool.
                                            You can find trending anime and manga with the GetTrendingAnimeOrManga tool.
                                            You can find torrents for anime using the GetNyaaTorrents tool, when doing so always provide the magnetlink and pick the torrent with 1080p resolution and the most seeds possible unless instructed otherwise, Get the closest match to the query, if no results turn up look up info on AniList and try the romaji or english name.
-
                                        """;
 
     private AgentSession? session;
@@ -111,7 +111,7 @@ public class AnswerBot : IDisposable
                 ResponseFormat = new ChatResponseFormatText(),
                 Tools =
                 [
-                    AIFunctionFactory.Create(WebPageTool.GetWebPage),
+                    AIFunctionFactory.Create(webPageTool.GetWebPage),
                     AIFunctionFactory.Create(aniListTools.GetAnimeOrManga),
                     AIFunctionFactory.Create(aniListTools.GetTrendingAnimeOrManga),
                     AIFunctionFactory.Create(NyaaTool.GetNyaaTorrents)

@@ -3,14 +3,14 @@ using PuppeteerSharp;
 
 namespace TullaLLMLib.Tools;
 
-public static class WebPageTool
+public class WebPageTool(LlmSettings config)
 {
     [Description("Get the HTML of the provided website.")]
-    public static async Task<string> GetWebPage([Description("The web page to load")] string url)
+    public async Task<string> GetWebPage([Description("The web page to load")] string url)
     {
         try
         {
-            AppContext.SetData("APP_CONTEXT_BASE_DIRECTORY", "C:\\Users\\ms\\AppData\\Roaming\\XIVLauncher\\pluginConfigs\\TullaLLM"); // TODO: user user space
+            AppContext.SetData("APP_CONTEXT_BASE_DIRECTORY",  config.WorkingDirectory);
             var options = new LaunchOptions
             {
                 Headless = true
