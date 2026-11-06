@@ -1,23 +1,23 @@
 [
-    {
-        "Author": "Tulla Ai",
-        "Name": "TullaLLM",
-        "InternalName": "TullaLLM",
-        "AssemblyVersion": "0.0.23",
-        "Description": "Use /llm to send questions to a local LLM and do web searches, also supports looking up info on AniList and finding torrents on nyaa.si.\nUse /tl to send a translated message to say chat.",
-        "Punchline": "Ask the clanker shit.",
-        "ApplicableVersion": "any",
-        "Tags": [
-            "casting",
-            "plugin",
-            "combat"
-        ],
-        "DalamudApiLevel": 15,
-        "IsHide": "False",
-        "IsTestingExclusive": "False",
-        "AcceptsFeedback": true,
-        "RepoUrl": "https://github.com/Tulla4U/TullaLLM",
-        "LastUpdate": 1749322771,
-        "DownloadLinkInstall": "https://github.com/Tulla4U/TullaLLM/releases/download/0.0.1/TullaLLM.zip"
-    }
+  {
+    "Author": "Tulla Ai",
+    "Name": "TullaLLM",
+    "InternalName": "TullaLLM",
+    "AssemblyVersion": "0.0.2",
+    "Description": "Use /llm to send questions to a local LLM and do web searches, also supports looking up info on AniList and finding torrents on nyaa.si.\nUse /tl to send a translated message to say chat.",
+    "Punchline": "Ask the clanker shit.",
+    "ApplicableVersion": "any",
+    "Tags": [
+      "casting",
+      "plugin",
+      "combat"
+    ],
+    "DalamudApiLevel": 15,
+    "IsHide": "False",
+    "IsTestingExclusive": "False",
+    "AcceptsFeedback": true,
+    "RepoUrl": "https://github.com/Tulla4U/TullaLLM",
+    "LastUpdate": 1749322771,
+    "DownloadLinkInstall": "https://github.com/Tulla4U/TullaLLM/releases/download/0.0.2/TullaLLM.zip"
+  }
 ]
