@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using OllamaSharp;
@@ -10,7 +11,7 @@ public class AnswerBot : IDisposable
 {
     private readonly LlmSettings settings;
     private AIAgent agent;
-    private readonly WebSearchTool search;
+    private readonly WebSearchTool? search;
     private readonly IChatInteractor chatInteractor;
     private readonly AniListTools aniListTools = new();
     private bool ready;
@@ -18,17 +19,24 @@ public class AnswerBot : IDisposable
     public AnswerBot(LlmSettings config, IChatInteractor chatInteractor)
     {
         this.chatInteractor = chatInteractor;
-        search = new WebSearchTool(config.LangSearchApiToken);
+        if (!string.IsNullOrEmpty(config.LangSearchApiToken))
+        {
+            
+            search = new WebSearchTool(config.LangSearchApiToken);
+        }
         settings = config;
         if (!string.IsNullOrEmpty(config.Model) && !string.IsNullOrEmpty(config.BaseUrl))
         {
+#pragma warning disable MAAI001
             agent = CreateAgent(config.Model);
+#pragma warning restore MAAI001
         }
     }
 
     private const string Instruction = """
 
-                                           you are a straight to the point helper that provides short concise answers to the user. 
+                                           you are a straight to the point helper that provides short concise answers to the user.
+                                           You are running as a plugin in FinalFantasy XIV, assume questions about places and activites are relating to the game.
                                            Answer questions using the provided context.
                                            You do not add any fluff or praise. 
                                            Do not use any markdown or other forms of formatting. Plain text only. 
@@ -54,10 +62,10 @@ public class AnswerBot : IDisposable
                     session = await CreateSession();
                 }
             }
-            await chatInteractor.SendMessage("User", query, ChatType.Party);
+            await chatInteractor.PrintLocalMessage("User", query, ChatType.Party);
             session ??= await CreateSession();
             var response = await agent.RunAsync(query, session);
-            await chatInteractor.SendMessage("LLM", response.Text, ChatType.Party);
+            await chatInteractor.PrintLocalMessage("LLM", response.Text, ChatType.Party);
         }
         catch (Exception ex)
         {
@@ -72,9 +80,23 @@ public class AnswerBot : IDisposable
         return session;
     }
 
+    [Experimental("MAAI001")]
     private AIAgent CreateAgent(string modelName)
     {
-        var chatOptions = new ChatClientAgentOptions
+        IEnumerable<AIContextProvider> contextProviders = search is null
+                                                              ? []
+                                                              :
+                                                              [
+                                                                  new TextSearchProvider(
+                                                                      search.SearchAdapter,
+                                                                      new TextSearchProviderOptions
+                                                                      {
+                                                                          SearchTime = TextSearchProviderOptions
+                                                                              .TextSearchBehavior
+                                                                              .OnDemandFunctionCalling
+                                                                      })
+                                                              ];
+        var chatOptions = new HarnessAgentOptions
         {
             ChatOptions = new ChatOptions
             {
@@ -96,18 +118,37 @@ public class AnswerBot : IDisposable
                 ]
             },
             Name = "TullaLLM",
-            AIContextProviders = [new TextSearchProvider(search.SearchAdapter, new TextSearchProviderOptions
-            {
-                SearchTime = TextSearchProviderOptions.TextSearchBehavior.OnDemandFunctionCalling
-            })]
+            AIContextProviders = contextProviders,
+            DisableWebSearch = search is null
         };
         ready = true;
-        return new OllamaApiClient(new OllamaApiClient.Configuration
+        var harnessAgent = new OllamaApiClient(new OllamaApiClient.Configuration
             {
                 Model = modelName,
                 Uri = new Uri(settings.BaseUrl)
             })
-            .AsAIAgent(chatOptions);
+            .AsHarnessAgent(chatOptions);
+        return new LoopAgent(
+            harnessAgent,
+            new DelegateLoopEvaluator(async (context, cancellationToken) =>
+            {
+                var todoProvider = context.Agent.GetService<TodoProvider>()
+                                   ?? throw new InvalidOperationException(
+                                       "The agent did not expose a TodoProvider.");
+                var remaining =
+                    await todoProvider
+                          .GetRemainingTodosAsync(context.Session, cancellationToken)
+                          .ConfigureAwait(false);
+                return remaining.Count > 0
+                           ? LoopEvaluation.Continue(
+                               $"Not all todos are complete yet ({remaining.Count} remaining). Please complete the remaining todo items.")
+                           : LoopEvaluation.Stop();
+            }),
+            new LoopAgentOptions
+            {
+                MaxIterations = 5
+            });
+        // .AsAIAgent(chatOptions);
     }
 
     public void SelectModel(string modelName)
@@ -116,7 +157,9 @@ public class AnswerBot : IDisposable
         {
             return;
         }
+#pragma warning disable MAAI001
         agent = CreateAgent(modelName);
+#pragma warning restore MAAI001
     }
 
     public void Dispose()
