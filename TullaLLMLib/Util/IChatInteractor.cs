@@ -2,7 +2,9 @@ namespace TullaLLMLib.Util;
 
 public interface IChatInteractor
 {
-    Task SendMessage(string name, string message, ChatType chatType);
+    event EventHandler<MessageReceivedEventArgs>? OnMessageReceived;
+    Task PrintLocalMessage(string name, string message, ChatType chatType);
+    void SendGameMessage(string message, ChatType chatType);
 }
 
 public enum ChatType
@@ -10,3 +12,6 @@ public enum ChatType
     Party,
     Say
 }
+
+
+public record MessageReceivedEventArgs(string Message, string Sender);

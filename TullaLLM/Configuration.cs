@@ -1,5 +1,6 @@
 ﻿using System;
 using Dalamud.Configuration;
+using Translate;
 using TullaLLMLib;
 
 namespace TullaLLM;
@@ -9,6 +10,14 @@ public class Configuration : IPluginConfiguration
 {
     public int Version { get; set; } = 0;
     public LlmSettings LlmSettings { get; set; } = new();
+
+    public TranslationConfig TranslationConfig { get; set; } = new()
+    {
+        IncomingLanguage = Language.German,
+        OutgoingLanguage = Language.English,
+        OllamaUri = "http://127.0.0.1:11434",
+        ModelName = "translategemma:4b"
+    };
 
     // The below exists just to make saving less cumbersome
     public void Save()

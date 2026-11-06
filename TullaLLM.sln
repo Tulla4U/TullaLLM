@@ -8,11 +8,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{80100F33-28C6-4357-AB55-B895A13D8F03}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TullaLLMLib", "TullaLLMLib\TullaLLMLib.csproj", "{845DB837-B4F7-45BF-BBD8-610A0A263390}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TullaLlmLib.Tests", "TullaLlmLib.Tests\TullaLlmLib.Tests.csproj", "{2A1BE08B-22B2-4378-8690-364F517C3E24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Translate", "Translate\Translate.csproj", "{FC32BBD2-E94F-41BB-B92B-C0637D208AEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +39,10 @@ Global
 		{2A1BE08B-22B2-4378-8690-364F517C3E24}.Debug|x64.Build.0 = Debug|Any CPU
 		{2A1BE08B-22B2-4378-8690-364F517C3E24}.Release|x64.ActiveCfg = Release|Any CPU
 		{2A1BE08B-22B2-4378-8690-364F517C3E24}.Release|x64.Build.0 = Release|Any CPU
+		{FC32BBD2-E94F-41BB-B92B-C0637D208AEA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FC32BBD2-E94F-41BB-B92B-C0637D208AEA}.Debug|x64.Build.0 = Debug|Any CPU
+		{FC32BBD2-E94F-41BB-B92B-C0637D208AEA}.Release|x64.ActiveCfg = Release|Any CPU
+		{FC32BBD2-E94F-41BB-B92B-C0637D208AEA}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

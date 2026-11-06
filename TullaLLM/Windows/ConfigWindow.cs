@@ -39,7 +39,6 @@ public class ConfigWindow : Window, IDisposable
 
     public override void Draw()
     {
-        // Can't ref a property, so use a local copy
         var baseUrl = configuration.LlmSettings.BaseUrl;
         if (ImGui.InputText("URL to your Ollama Endpoint", ref baseUrl))
         {

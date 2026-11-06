@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Update="DotNet.ReproducibleBuilds" Version="2.0.5" />
+    <PackageReference Include="ECommons" Version="3.2.1.26" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Translate\Translate.csproj" />
     <ProjectReference Include="..\TullaLLMLib\TullaLLMLib.csproj" />
   </ItemGroup>
 </Project>

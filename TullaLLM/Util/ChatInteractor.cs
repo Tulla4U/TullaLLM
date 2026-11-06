@@ -1,8 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
+using ECommons.Automation;
 using TullaLLMLib.Tools;
 using TullaLLMLib.Util;
 
@@ -10,7 +11,30 @@ namespace TullaLLM.Util;
 
 public class ChatInteractor: IChatInteractor
 {
-    public async Task SendMessage(string name, string message, ChatType chatType)
+    public event EventHandler<MessageReceivedEventArgs>? OnMessageReceived;
+    private readonly XivChatType[] subscribedChatModes = [XivChatType.Say];
+    
+    public ChatInteractor()
+    {
+        Plugin.ChatGui.ChatMessageUnhandled += OnDalamudMessageReceived;
+        // Plugin.ChatGui.CheckMessageHandled
+    }
+
+    private void OnDalamudMessageReceived(IChatMessage message)
+    {
+        if (!subscribedChatModes.Contains(message.LogKind))
+        {
+            return;
+        }
+        OnMessageReceived?.Invoke(this, new MessageReceivedEventArgs(message.Message.TextValue, message.Sender.TextValue));
+    }
+
+    public void SendGameMessage(string message, ChatType chatType)
+    {
+        Chat.SendMessage($"/{chatType.ToString()} {message}");
+    }
+
+    public async Task PrintLocalMessage(string name, string message, ChatType chatType)
     {
         if (message.Length > 450)
         {

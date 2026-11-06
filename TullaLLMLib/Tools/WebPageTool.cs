@@ -10,7 +10,7 @@ public static class WebPageTool
     {
         try
         {
-            AppContext.SetData("APP_CONTEXT_BASE_DIRECTORY", "C:\\Users\\ms\\AppData\\Roaming\\XIVLauncher\\pluginConfigs\\TullaLLM");
+            AppContext.SetData("APP_CONTEXT_BASE_DIRECTORY", "C:\\Users\\ms\\AppData\\Roaming\\XIVLauncher\\pluginConfigs\\TullaLLM"); // TODO: user user space
             var options = new LaunchOptions
             {
                 Headless = true
@@ -25,7 +25,10 @@ public static class WebPageTool
 
             return await page.GetContentAsync();
         }
-        catch (Exception e) { }
+        catch
+        {
+            // ignored
+        }
 
         return "Page load failed.";
     }
