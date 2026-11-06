@@ -1,0 +1,84 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+    push:
+        tags-ignore:
+            - testing_*
+
+jobs:
+    build:
+        
+        runs-on: windows-latest
+        
+        steps:
+            - uses: actions/checkout@v4
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: 10.0.x
+            - name: Restore dependencies
+              run: dotnet restore
+            - name: Download Dalamud
+              run: |
+                  Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile latest.zip
+                  Expand-Archive -Force latest.zip "$env:AppData\XIVLauncher\addon\Hooks\dev"
+            - name: Build
+              run: |
+                  $ver = '${{ github.ref_name }}'
+                  dotnet build --no-restore --configuration Release --nologo -p:Version=$ver -p:FileVersion=$ver -p:AssemblyVersion=$ver    
+            - name: write version into json
+              run: |
+                  $ver = '${{ github.ref_name }}' -replace 'testing_'
+                  $path = './TullaLLM/bin/x64/Release/TullaLLM.json'
+                  $json = Get-Content -Raw $path | ConvertFrom-Json
+                  $json.AssemblyVersion = $ver
+                  $content = $json | ConvertTo-Json
+                  set-content -Path $path -Value $content
+            - name: Archive
+              run: Compress-Archive -Path TullaLLM/bin/x64/Release/* -DestinationPath TullaLLM.zip
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v4.6.2
+              with:
+                  path: ./TullaLLM/bin/x64/Release/*
+            - name: Create Release
+              id: create_release
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: ${{ github.ref }}
+                  release_name: TullaLLM ${{ github.ref }}
+                  draft: false
+                  prerelease: false
+            - name: Upload Release Asset
+              id: upload-release-asset
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }} # pull id from above
+                  asset_path: ./TullaLLM.zip
+                  asset_name: TullaLLM.zip
+                  asset_content_type: application/zip
+            - name: Write out repo.json
+              run: |
+                  $ver = '${{ github.ref_name }}'
+                  $path = './repo.json'
+                  $json = Get-Content -Raw $path | ConvertFrom-Json
+                  $json[0].AssemblyVersion = $ver
+                  $json[0].DownloadLinkInstall = $json.DownloadLinkInstall -replace '[^/]+/TullaLLM.zip',"$ver/TullaLLM.zip"
+                  $content = $json | ConvertTo-Json -AsArray
+                  set-content -Path $path -Value $content
+
+            - name: Commit repo.json
+              run: |
+                  git config --global user.name "Actions User"
+                  git config --global user.email "actions@github.com"
+                  git fetch origin master
+                  git checkout master
+                  git add repo.json
+                  git commit -m "[CI] Updating repo.json for ${{ github.ref_name }}" || true
+                  git push origin master
