@@ -27,7 +27,7 @@ Configuration is very much in a broken state, so you can't rely on the UI actual
 3. Translation: Open terminal and pull a translation model e.g. `ollama pull translategemma:4b`
 
 ### Plugin
-1. Add the repo `dasdasdasd`
+1. Add the repo `https://raw.githubusercontent.com/Tulla4U/TullaLLM/refs/heads/master/repo.json`
 2. Install Tulla LLM
 3. Chat Bot
    1. Open `/llm-cfg` and enter your ollama endpoint default: `http://127.0.0.1:11434`
